@@ -1,0 +1,81 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: url("../images/Puzzle-Bobble-Everybubble.jpg");
+    background-size: 140%;
+    background-color: white;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    font-family: Verdana, sans-serif;
+}
+
+input {
+    border: none;
+    border-bottom: 1px solid black;
+    text-align: center;
+}
+
+input:focus {
+    outline: none;
+}
+
+#game {
+    background-color:rgba(255,255,255,0.825);;
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    /* margin-top: 20px; */
+    margin-bottom: 20px;
+    /* border-bottom: 4px solid black; */
+    border: 6px solid rgb(138, 154, 91);
+    border-radius: 10px;
+    /* box-shadow: 0px 0px 5px rgba(0,0,0,0.325); */
+    padding: 10px;
+}
+
+.card {
+    background-color:rgba(255,255,255,0.825);
+    border: 6px solid rgb(138, 154, 91);
+}
+
+.input-group {
+    /* border: 1px solid black; */
+    border-radius: 5px;
+}
+
+.input-group-prepend {
+    background-color: transparent;
+    border: none;
+}
+
+.input-group-text {
+    background-color: transparent;
+    border: none;
+}
+
+.form-control {
+    background-color: transparent !important;
+    border: none;
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.form-control:focus {
+    background-color: inherit;
+    outline: none;
+    box-shadow: none;
+    text-align: left;
+}
+
+.font-bolder {
+    font-weight: bolder;
+}
