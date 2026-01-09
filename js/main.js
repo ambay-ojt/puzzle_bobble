@@ -32,6 +32,10 @@ canvas.height = grid * game_row;
 //   ['B','G','G','R','R','Y','Y']
 // ];
 
+var p_sound = new Audio("audio/point.mp3");
+var d_sound = new Audio("audio/die.mp3");
+var fly_sound = new Audio("audio/vine.mp3");
+
 var level1 = [];
 var bubbleImage = new Image;
 bubbleImage.onload = function() {
@@ -749,37 +753,28 @@ function loop(gts) {
     // context.lineTo(10, grid * 0.4);
     // context.stroke();
 
-    // context.strokeStyle = 'gold';
-    // context.lineWidth = 4;
-    // context.beginPath();
-    // let ptx = (grid * 1.5);
-    // let lh = 10;
-    // for (let lti = 0; lti < 10; lti++) {
+    context.strokeStyle = 'gray';
+    context.lineWidth = 1;
+    context.lineJoin = 'round'; // Makes the arrow tip look cleaner
+    context.beginPath();
 
-    //     context.moveTo(0, ptx);
-    //     context.lineTo(0, ptx - (lh / 2));
-    //     ptx = ptx - lh;
-    // }
+    // Vertical segment
+    let ptx = (grid * 1.5);
+    let lh = 10;
+    for (let lti = 0; lti < 24; lti++) {
+        context.moveTo(0, ptx);
+        context.lineTo(0, ptx - (lh / 1));
+        ptx = ptx - lh;
+    }
 
-    // let nr = shootDeg / (Math.PI / 180);
-    // let na;
-    // if (nr > 0) {
-    //     na = degToRad(270);
-    // } else {
-    //     na = degToRad(90);
-    // }
+    // Determine rotation
+    let nr = shootDeg / (Math.PI / 180);
+    let na = (nr > 0) ? (Math.PI * 1.5) : (Math.PI * 0.5); // 270 or 90 degrees
 
+    context.rotate(na); 
     
-    // context.rotate(na); 
-    // let ltx = ptx + 100;
-    // for (let lti = 0; lti < 20; lti++) {
 
-    //     context.moveTo(ptx, ltx);
-    //     context.lineTo(ptx, ltx - (lh / 2));
-    //     ltx = ltx - lh;
-    // }
 
-    
     context.stroke();
     context.restore();
 
