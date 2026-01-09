@@ -12,7 +12,7 @@
         <img src="images/title.png" style="display: block;margin-left: auto;margin-right: auto;width: 200px;">
     </div>
 </div>
-<div class="row" style="max-width: 1200px;margin-left: auto;margin-right: auto;">
+<div class="row" style="margin-left: 200px;margin-right: 200px;">
     <div class="col-sm-3">
         <div class="card" style="display: block;margin-left: auto;margin-right: auto;">
             <div class="card-header text-center" style="font-size: 20px;font-weight: bolder;">Game Info</div>    
@@ -20,55 +20,54 @@
             <div class="card-body">
                 
                 <div class="input-group input-group-sm">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text px-1 font-bolder">Name : </div>
+                    <div class="input-group-prepend fs-5">
+                        <div class="input-group-text px-1 font-bolder fs-5">Name : </div>
                     </div>
-                    <input id="player_name" class="form-control form-control-sm font-bolder" type="text" value="" placeholder="Player Name">
+                    <input id="player_name" class="form-control form-control-sm font-bolder fs-5" type="text" value="" placeholder="Player Name">
                 </div>
 
                 <div class="input-group input-group-sm">
                     <div class="input-group-prepend">
-                        <div class="input-group-text px-1 font-bolder">Level : </div>
+                        <div class="input-group-text px-1 font-bolder fs-5">Level : </div>
                     </div>
-                    <input id="game_level" class="form-control form-control-sm text-center font-bolder" type="number" min="1" value="1" disabled>
+                    <input id="game_level" class="form-control form-control-sm text-center font-bolder fs-5" type="number" min="1" value="1" disabled>
                 </div>
 
 
                 <div class="input-group input-group-sm">
                     <div class="input-group-prepend">
-                        <div class="input-group-text px-1 font-bolder">Score : </div>
+                        <div class="input-group-text px-1 font-bolder fs-5">Score : </div>
                     </div>
-                    <input id="game_score" class="form-control form-control-sm text-center font-bolder" type="number" min="0" value="0" disabled>
+                    <input id="game_score" class="form-control form-control-sm text-center font-bolder fs-5" type="number" min="0" value="0" disabled>
                 </div>
 
                 <div class="mt-1">
-                    <button id="game_start" class="btn btn-outline-success btn-sm w-100 mt-1 font-bolder" onclick="start_game()">Start</button>
-                    <button class="btn btn-outline-warning btn-sm w-100 mt-1 font-bolder" onclick="restart_game()">Restart</button>
+                    <button id="game_start" class="btn btn-outline-success btn-sm w-100 mt-1 font-bolder fs-5" onclick="start_game()">Start</button>
+                    <button class="btn btn-outline-warning btn-sm w-100 mt-1 font-bolder fs-5" onclick="restart_game()">Restart</button>
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
     <div class="col-sm-6">
         <canvas id="game"></canvas>
     </div>
+
     <div class="col-sm-3">
         <div class="card">
-            
+            <div class="card-header font-bolder text-center" style="font-size: 20px;">
+                Bobble Time!
+            </div>
             <div class="card-body">
                 <div id="timer" class="font-bolder" style="font-size: 20px;text-align: center;display: block;">0</div>
             </div>
-            
         </div>
         <div class="card mt-3">
             <div class="card-header text-center" style="font-size: 20px;font-weight: bolder;">Scores</div>  
-            <table id="scoreboard">
+            <table id="scoreboard" class="m-4 fs-5">
             </table>
-        </div>
-        
+        </div> 
     </div>
 </div>
 </body>
@@ -80,8 +79,8 @@
 
 <script src="dist/jquery-3.6.0.min.js"></script>
 
-<script src="js/main.js"></script>
 <script src="js/topscores.js"></script>
+<script src="js/main.js"></script>
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 
 </html>
