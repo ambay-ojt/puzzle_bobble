@@ -11,8 +11,13 @@
     <div class="col-sm-12" style="text-align: center;font-size: 60px;font-weight: bolder;">
         <img src="images/title.png" style="display: block;margin-left: auto;margin-right: auto;width: 200px;">
     </div>
+
+    <button id="muteBtn" class="btn btn-light" 
+        style="position: fixed; top: 20px; right: 20px; z-index: 1000; border-radius: 50%; width: 50px; height: 50px; border: 2px solid green;">
+        <i id="musicIcon" class="fas fa-music" style="color: green; font-size: 20px;"></i>
+    </button>
 </div>
-<div class="row" style="margin-left: 200px;margin-right: 200px;">
+<div class="row" style="margin-left: 50px;margin-right: 50px;">
     <div class="col-sm-3">
         <div class="card" style="display: block;margin-left: auto;margin-right: auto;">
             <div class="card-header text-center" style="font-size: 20px;font-weight: bolder;">Game Info</div>    
@@ -45,9 +50,26 @@
                     <button id="game_start" class="btn btn-outline-success btn-sm w-100 mt-1 font-bolder fs-5" onclick="start_game()">Start</button>
                     <button class="btn btn-outline-warning btn-sm w-100 mt-1 font-bolder fs-5" onclick="restart_game()">Restart</button>
                 </div>
-
             </div>
         </div>
+
+        <div class="card mt-3">
+            <div class="row g-0">
+                <div class="col-5 col-sm-4">
+                    <div class="card-header text-center" style="font-size: 15px; font-weight: bolder;">Shooter Speed</div>   
+                </div>
+                <div class="col-7 col-sm-8">
+                <div class="card-body d-flex justify-content-center align-items-center" style="color: green;">
+                    <div id="controls">
+                        <input type="number" id="rotationSpeed" min="0.5" max="10" step="0.5" value="2" 
+                            style="width: 80px; text-align: center; border: 2px solid green; border-radius: 5px; font-weight: bold;">
+                        <span style="font-weight: bold; margin-left: 5px;">deg</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
     </div>
 
     <div class="col-sm-6">

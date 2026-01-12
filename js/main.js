@@ -3,9 +3,10 @@ const context = canvas.getContext('2d');
 const grid = 40; // pixel size
 
 var game_state = "game_over";
-var game_row = 15;
+var game_row = 18;
 var game_score = 0;
-var game_col = 10;
+var rotationSpeed = 2; //default speed of shooter
+var game_col = 16;
 var game_time = 0;
 var game_level = 1;
 var animi = 0; // animation index
@@ -23,7 +24,7 @@ canvas.height = grid * game_row;
 
 
 // each even row is 8 bubbles long and each odd row is 7 bubbles long.
-// the level consists of 4 rows of bubbles of 4 colors: red, orange,
+// the level consists of 4 rows of bubbles of 4 colors: red, orange,s
 // green, and yellow
 // const level1 = [
 //   ['R','R','Y','Y','B','B','G','G'],
@@ -32,9 +33,14 @@ canvas.height = grid * game_row;
 //   ['B','G','G','R','R','Y','Y']
 // ];
 
-var p_sound = new Audio("audio/point.mp3");
-var d_sound = new Audio("audio/die.mp3");
-var fly_sound = new Audio("audio/vine.mp3");
+var shoot_sound = new Audio("audio/shoot.mp3");
+var pop_sound = new Audio("audio/pop.mp3"); 
+var bounce_sound = new Audio("audio/bounce.mp3");
+var bg_music = new Audio("audio/background_theme.mp3");
+bg_music.loop = true;  
+bg_music.volume = 0.5; 
+shoot_sound.volume = 0.9;
+pop_sound.volume = 0.6;
 
 var level1 = [];
 var bubbleImage = new Image;
@@ -96,6 +102,34 @@ let particles = [];
 // check_game_access();
 check_allow_config();
 
+// Update the variable whenever the slider changes
+document.getElementById('rotationSpeed').addEventListener('input', function(e) {
+    let val = parseFloat(e.target.value);
+    
+    // Check if the input is a valid number to prevent game glitches
+    if (!isNaN(val)) {
+        rotationSpeed = val;
+    }
+});
+
+document.getElementById('muteBtn').addEventListener('click', function() {
+    const icon = document.getElementById('musicIcon');
+    
+    if (bg_music.paused) {
+        bg_music.play();
+        // Change icon to Music Note
+        icon.className = "fas fa-music"; 
+        this.style.borderColor = "green";
+        icon.style.color = "green";
+    } else {
+        bg_music.pause();
+        // Change icon to Muted Volume
+        icon.className = "fas fa-volume-mute"; 
+        this.style.borderColor = "red";
+        icon.style.color = "red";
+    }
+});
+
 function start_game() {
 
     if (document.getElementById("player_name") && !document.getElementById("player_name").value) {
@@ -106,10 +140,13 @@ function start_game() {
 
     if (game_state != "playing") {
         game_state = "playing";
+        bg_music.play();
         document.getElementById("game_start").style.display = "none";
         bubbles = [];
         particles = [];
         create_level();
+        getNewBubble();
+        getNewBubble();
         start_timer();
         check_remaining_bubbles();
     }
@@ -403,7 +440,18 @@ function removeMatch(targetBubble) {
         }
 
     }
-    
+
+    if (matches.length >= 3) {
+        // Play the collapse/pop sound
+        pop_sound.currentTime = 0;
+        pop_sound.play();
+
+        matches.forEach(bubble => {
+            bubble.active = false;
+        });
+        // ... rest of your scoring logic
+    }
+        
 }
 
 function check_remaining_bubbles() {
@@ -514,6 +562,13 @@ const curBubble = {
     anim_index : 0
 };
 
+const nextBubble = {
+    x: canvas.width - 60, // Position on the canvas (adjust as needed)
+    y: canvas.height - 40,
+    color: 'blue',
+    anim_index: 0
+};
+
 // angle (in radians) of the shooting arrow
 let shootDeg = 0;
 
@@ -526,36 +581,29 @@ let shootDir = 0;
 
 // reset the bubble to shoot to the bottom of the screen
 function getNewBubble() {
-
     if (game_state != 'playing') { return; }
 
+    // Move the "Next" bubble color to the "Current" bubble
+    curBubble.color = nextBubble.color;
+    curBubble.anim_index = nextBubble.anim_index;
+
+    // Reset current bubble position and velocity
     curBubble.x = curBubblePos.x;
     curBubble.y = curBubblePos.y;
     curBubble.dx = curBubble.dy = 0;
-    curBubble.anim_index = getRandomInt(0, 3);
 
+    // Generate the actual "Next" bubble color for the future
     let tmpColors = [];
-
     for (let b = 0; b < bubbles.length; b++) {
-
         if (!bubbles[b]['color'] || !bubbles[b]['active']) { continue; }
-        if (tmpColors.includes(bubbles[b]['color'])) {
-            continue;
+        if (!tmpColors.includes(bubbles[b]['color'])) {
+            tmpColors.push(bubbles[b]['color']);
         }
-        tmpColors.push(bubbles[b]['color']);
     }
     
     let rnd = getRandomInt(0, tmpColors.length - 1);
-    // let rnd;
-    // if (game_level < 5) {
-    //     rnd = getRandomInt(0, game_level + 1);
-    // } else {
-    //     rnd = getRandomInt(0, colorV.length - 1);
-    // }
-    // const randInt = getRandomInt(0, colors.length - 1);
-    // curBubble.color = colors[randInt];
-    // curBubble.color = colors[rnd];
-    curBubble.color = tmpColors[rnd];
+    nextBubble.color = tmpColors[rnd];
+    nextBubble.anim_index = getRandomInt(0, 3);
 }
 
 // handle collision between the current bubble and another bubble
@@ -581,8 +629,9 @@ function loop(gts) {
     
     context.clearRect(0,0,canvas.width,canvas.height);
 
+    drawAimingLine();
     // move the shooting arrow
-    shootDeg = shootDeg + degToRad(2) * shootDir;
+    shootDeg = shootDeg + degToRad(rotationSpeed) * shootDir;
 
     // prevent shooting arrow from going below/above min/max
     if (shootDeg < minDeg) {
@@ -600,11 +649,20 @@ function loop(gts) {
     if (curBubble.x - grid / 2 < wallSize) {
         curBubble.x = wallSize + grid / 2;
         curBubble.dx *= -1;
+        
+        // Play sound for Left Wall
+        bounce_sound.currentTime = 0;
+        bounce_sound.play();
     }
     else if (curBubble.x + grid / 2 > canvas.width - wallSize) {
         curBubble.x = canvas.width - wallSize - grid / 2;
         curBubble.dx *= -1;
+
+        // Play sound for Right Wall
+        bounce_sound.currentTime = 0;
+        bounce_sound.play();
     }
+
 
     // check to see if bubble collides with the top wall
     if (curBubble.y - grid / 2 < wallSize) {
@@ -621,6 +679,8 @@ function loop(gts) {
             const closestBubble = getClosestBubble(curBubble);
             if (!closestBubble)  {
                 window.alert('Game Over, Score will be recorded');
+                bg_music.pause();
+                bg_music.currentTime = 0;
                 // Record score on database jquery
                 // window.location.reload();
                 game_state = "game_over";
@@ -648,6 +708,28 @@ function loop(gts) {
     // context.fillRect(0, 0, canvas.width, wallSize);
     // context.fillRect(0, 0, wallSize, canvas.height);
     // context.fillRect(canvas.width - wallSize, 0, wallSize, canvas.height);
+
+
+    // Draw "Next" Label
+    context.fillStyle = 'green';
+    context.font = 'bold 14px Arial';
+    context.fillText('NEXT:', nextBubble.x - 20, nextBubble.y - 35);
+
+    // Calculate sprite position for next bubble
+    let nx, ny;
+    switch (nextBubble.color) {
+        case "blue": nx = 2 + (nextBubble.anim_index * ag); ny = 4; break;
+        case "red": nx = 2 + (nextBubble.anim_index * ag); ny = 31; break;
+        case "yellow": nx = 2 + (nextBubble.anim_index * ag); ny = 58; break;
+        case "green": nx = 2 + (nextBubble.anim_index * ag); ny = 85; break;
+        case "violet": nx = 2 + (nextBubble.anim_index * ag); ny = 112; break;
+        case "orange": nx = 2 + (nextBubble.anim_index * ag); ny = 139; break;
+        case "black": nx = 2 + (nextBubble.anim_index * ag); ny = 166; break;
+        case "gray": nx = 2 + (nextBubble.anim_index * ag); ny = 193; break;
+    }
+
+    // Draw the next bubble preview (slightly smaller)
+    context.drawImage(bubbleImage, nx, ny, 18, 18, nextBubble.x - (grid/2.5), nextBubble.y - (grid/2.5), grid * 0.8, grid * 0.8);
 
     // draw bubbles and particles
     bubbles.concat(particles).forEach(bubble => {
@@ -752,26 +834,6 @@ function loop(gts) {
     // context.moveTo(0, 0);
     // context.lineTo(10, grid * 0.4);
     // context.stroke();
-
-    context.strokeStyle = 'gray';
-    context.lineWidth = 1;
-    context.lineJoin = 'round'; // Makes the arrow tip look cleaner
-    context.beginPath();
-
-    // Vertical segment
-    let ptx = (grid * 1.5);
-    let lh = 10;
-    for (let lti = 0; lti < 24; lti++) {
-        context.moveTo(0, ptx);
-        context.lineTo(0, ptx - (lh / 1));
-        ptx = ptx - lh;
-    }
-
-    // Determine rotation
-    let nr = shootDeg / (Math.PI / 180);
-    let na = (nr > 0) ? (Math.PI * 1.5) : (Math.PI * 0.5); // 270 or 90 degrees
-
-    context.rotate(na); 
     
 
 
@@ -817,6 +879,10 @@ document.addEventListener('keydown', (e) => {
 
         // if the current bubble is not moving we can launch it
         if (e.code === 'Space' &&  curBubble.dx === 0 && curBubble.dy === 0) {
+
+            shoot_sound.currentTime = 0; // Reset to start so it can play rapidly
+            shoot_sound.play();
+
             // convert an angle to x/y
             curBubble.dx = Math.sin(shootDeg) * curBubble.speed;
             curBubble.dy = -Math.cos(shootDeg) * curBubble.speed;
@@ -856,6 +922,42 @@ function start_timer(t = 0) {
         t--;
         return start_timer(t);
     }, 1000);
+}
+
+function drawAimingLine() {
+    if (game_state !== 'playing' || curBubble.dx !== 0 || curBubble.dy !== 0) return;
+
+    // Start coordinates (center of the shooter)
+    let tempX = curBubblePos.x;
+    let tempY = curBubblePos.y;
+    
+    // Direction based on shooter angle
+    let tempDx = Math.sin(shootDeg) * 5; // Smaller multiplier for denser dots
+    let tempDy = -Math.cos(shootDeg) * 5;
+
+    context.save();
+    context.fillStyle = 'rgba(202, 206, 2, 0.97)'; // Semi-transparent white dots
+
+    // Project dots forward
+    for (let i = 0; i < 40; i++) { // Increase i to make the line longer
+        tempX += tempDx * 3;
+        tempY += tempDy * 3;
+
+        // Wall Bouncing for the dots
+        if (tempX - grid / 2 < wallSize || tempX + grid / 2 > canvas.width - wallSize) {
+            tempDx *= -1;
+        }
+
+        // Stop dots if they hit the top or existing bubbles
+        const hitBubble = getClosestBubble({x: tempX, y: tempY, radius: grid/4}, true);
+        if (tempY < wallSize || hitBubble) break;
+
+        // Draw a small dot
+        context.beginPath();
+        context.arc(tempX, tempY, 3, 0, Math.PI * 2);
+        context.fill();
+    }
+    context.restore();
 }
 
 
